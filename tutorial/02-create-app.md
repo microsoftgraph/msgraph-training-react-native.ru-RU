@@ -410,16 +410,17 @@
         initialRouteName: 'AuthLoading'
       }
     ));
+    ```
 
-1. Save all of your changes.
+1. Сохраните все изменения.
 
-1. Reload the application in your emulator.
+1. Перезагрузите приложение в симуляторе.
 
-The app's menu should work to navigate between the two fragments and change when you tap the **Sign in** or **Sign out** buttons.
+Меню приложения должно работать для перехода между двумя фрагментами и изменения при касании кнопок **входа** **и выхода.**
 
-![Screenshots of the application on Android](./images/android-app-screens.png)
+![Снимки экрана приложения на Android](./images/android-app-screens.png)
 
-![Screenshots of the application on iOS](./images/ios-app-screens.png)
+![Снимки экрана приложения на iOS](./images/ios-app-screens.png)
 
 > [!NOTE]
-> You may receive warnings when running the app about Async Storage or componentWillUpdate. For the purposes of this tutorial, you can dismiss those warnings.
+> При запуске приложения, посвященного асинхронному хранилищу или Компонентвиллупдате, могут возникать предупреждения. В рамках данного руководства вы можете отклонить эти предупреждения.
