@@ -2,17 +2,16 @@
 
 Для начала создайте новый реагирующий собственный проект.
 
-1. Откройте интерфейс командной строки (CLI) в каталоге, в котором нужно создать проект. Выполните приведенную ниже команду, чтобы установить средство " [реагирующие и CLI](https://github.com/facebook/react-native) ", а затем создайте новый реагирующий собственный проект.
+1. Откройте интерфейс командной строки (CLI) в каталоге, в котором нужно создать проект. Выполните следующую команду, чтобы запустить средство [реагирующих и CLI](https://github.com/facebook/react-native) , и создайте новый реагирующий собственный проект.
 
     ```Shell
-    npm install -g react-native-cli
-    react-native init GraphTutorial
+    npx react-native init GraphTutorial
     ```
 
 1. **Необязательно:** Убедитесь, что ваша среда разработки настроена правильно, выполнив проект. В интерфейсе командной строки смените каталог на только что созданный каталог **графтуториал** и выполните одну из следующих команд.
 
-    - Для iOS:`react-native run-ios`
-    - Для Android: запуск экземпляра эмулятора Android и запуск`react-native run-android`
+    - Для iOS:`npx react-native run-ios`
+    - Для Android: запуск экземпляра эмулятора Android и запуск`npx react-native run-android`
 
 ## <a name="install-dependencies"></a>Установка зависимостей
 
@@ -29,10 +28,9 @@
 1. Выполните следующую команду.
 
     ```Shell
-    npm install react-navigation@3.11.1 react-native-gesture-handler@1.3.0 react-native-reanimated@1.1.0
-    npm install react-native-elements@1.1.0 react-native-vector-icons@6.6.0 moment@2.24.0
-    npm install react-native-app-auth@4.4.0 @microsoft/microsoft-graph-client@1.7.0
-    react-native link react-native-vector-icons
+    npm install react-navigation@3.11.1 react-native-gesture-handler@1.5.2 react-native-reanimated@1.4.0
+    npm install react-native-elements@1.2.7 react-native-vector-icons@6.6.0 moment@2.24.0
+    npm install react-native-app-auth@4.4.0 @microsoft/microsoft-graph-client@2.0.0
     ```
 
 ### <a name="link-and-configure-dependencies-for-ios"></a>Связывание и Настройка зависимостей для iOS
@@ -45,6 +43,29 @@
 
     ```Shell
     pod install
+    ```
+
+1. Откройте файл **графтуториал/iOS/графтуториал/info. plist** в текстовом редакторе. Добавьте следующий код непосредственно перед последней `</dict>` строкой в файле.
+
+    ```xml
+    <key>UIAppFonts</key>
+    <array>
+      <string>AntDesign.ttf</string>
+      <string>Entypo.ttf</string>
+      <string>EvilIcons.ttf</string>
+      <string>Feather.ttf</string>
+      <string>FontAwesome.ttf</string>
+      <string>FontAwesome5_Brands.ttf</string>
+      <string>FontAwesome5_Regular.ttf</string>
+      <string>FontAwesome5_Solid.ttf</string>
+      <string>Foundation.ttf</string>
+      <string>Ionicons.ttf</string>
+      <string>MaterialIcons.ttf</string>
+      <string>MaterialCommunityIcons.ttf</string>
+      <string>SimpleLineIcons.ttf</string>
+      <string>Octicons.ttf</string>
+      <string>Zocial.ttf</string>
+    </array>
     ```
 
 1. Откройте файл **графтуториал/iOS/графтуториал/аппделегате. h** в текстовом редакторе. Замените его содержимое приведенным ниже.
@@ -76,7 +97,7 @@
     ]
     ```
 
-1. Сохраните файл. Эта `defaultConfig` запись должна выглядеть примерно так, как показано ниже.
+    Эта `defaultConfig` запись должна выглядеть примерно так, как показано ниже.
 
     ```Gradle
     defaultConfig {
@@ -90,6 +111,14 @@
         ]
     }
     ```
+
+1. Добавьте указанную ниже строку в конец файла.
+
+    ```Gradle
+    apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+    ```
+
+1. Сохраните файл.
 
 ## <a name="design-the-app"></a>Проектирование приложения
 
@@ -355,6 +384,9 @@
       }
     });
     ```
+
+1. Создайте новый каталог в каталоге **графтуториал** с именем **Images**.
+1. Добавьте в этот каталог изображение профиля по умолчанию с именем **но-профиле-пик. png** . Вы можете использовать любое изображение, которое вам нравится, или использовать [его из этого примера](https://github.com/microsoftgraph/msgraph-training-react-native/blob/master/demos/01-create-app/GraphTutorial/images/no-profile-pic.png).
 
 1. Откройте файл **графтуториал/App. js** и замените все содержимое приведенным ниже фрагментом.
 
