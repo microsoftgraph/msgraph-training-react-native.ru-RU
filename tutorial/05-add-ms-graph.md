@@ -6,21 +6,9 @@
 
 В этом разделе описывается расширение `GraphManager` класса для добавления функции, позволяющей получить события и обновление `CalendarScreen` , чтобы использовать эти новые функции.
 
-1. Откройте файл **графтуториал/Graph/графманажер. js** и добавьте следующий метод в `GraphManager` класс.
+1. Откройте файл **графтуториал/Graph/графманажер. Целевой** файл и добавьте указанный `GraphManager` ниже метод в класс.
 
-    ```js
-    static getEvents = async() => {
-      // GET /me/events
-      return graphClient.api('/me/events')
-        // $select='subject,organizer,start,end'
-        // Only return these fields in results
-        .select('subject,organizer,start,end')
-        // $orderby=createdDateTime DESC
-        // Sort results by when they were created, newest first
-        .orderby('createdDateTime DESC')
-        .get();
-    }
-    ```
+    :::code language="typescript" source="../demo/GraphTutorial/graph/GraphManager.ts" id="GetEventsSnippet":::
 
     > [!NOTE]
     > Рассмотрите, какие действия `getEvents` выполняет код.
@@ -29,12 +17,13 @@
     > - `select` Функция ограничит поля, возвращаемые для каждого события, только теми, которые приложение будет использовать в действительности.
     > - `orderby` Функция сортирует результаты по дате и времени создания, начиная с самого последнего элемента.
 
-1. Откройте **графтуториал/views/календарскрин. js** и замените все содержимое приведенным ниже кодом.
+1. Откройте **графтуториал/views/календарскрин. Целевой** элемент и замените все его содержимое приведенным ниже кодом.
 
-    ```JSX
+    ```typescript
     import React from 'react';
     import {
       ActivityIndicator,
+      Alert,
       FlatList,
       Modal,
       ScrollView,
@@ -42,18 +31,41 @@
       Text,
       View,
     } from 'react-native';
-    import { Icon } from 'react-native-elements';
+    import { createStackNavigator } from '@react-navigation/stack';
+
+    import { DrawerToggle, headerOptions } from '../menus/HeaderComponents';
     import { GraphManager } from '../graph/GraphManager';
 
-    export default class CalendarScreen extends React.Component {
-      static navigationOptions = ({navigation}) => {
-        return {
-          title: 'Calendar',
-          headerLeft: <Icon iconStyle={{ marginLeft: 10, color: 'white' }} size={30} name="menu" onPress={navigation.toggleDrawer} />
-        };
-      }
+    const Stack = createStackNavigator();
+    const initialState: CalendarScreenState = { loadingEvents: true, events: []};
+    const CalendarState = React.createContext(initialState);
 
-      state = {
+    type CalendarScreenState = {
+      loadingEvents: boolean;
+      events: any[];
+    }
+
+    // Temporary JSON view
+    const CalendarComponent = () => {
+      const calendarState = React.useContext(CalendarState);
+
+      return (
+        <View style={styles.container}>
+          <Modal visible={calendarState.loadingEvents}>
+            <View style={styles.loading}>
+              <ActivityIndicator animating={calendarState.loadingEvents} size='large' />
+            </View>
+          </Modal>
+          <ScrollView>
+            <Text>{JSON.stringify(calendarState.events, null, 2)}</Text>
+          </ScrollView>
+        </View>
+      );
+    }
+
+    export default class CalendarScreen extends React.Component {
+
+      state: CalendarScreenState = {
         loadingEvents: true,
         events: []
       };
@@ -67,23 +79,31 @@
             events: events.value
           });
         } catch(error) {
-          alert(error);
+          Alert.alert(
+            'Error getting events',
+            JSON.stringify(error),
+            [
+              {
+                text: 'OK'
+              }
+            ],
+            { cancelable: false }
+          );
         }
       }
 
-      // Temporary JSON view
       render() {
         return (
-          <View style={styles.container}>
-            <Modal visible={this.state.loadingEvents}>
-              <View style={styles.loading}>
-                <ActivityIndicator animating={this.state.loadingEvents} size='large' />
-              </View>
-            </Modal>
-            <ScrollView>
-              <Text>{JSON.stringify(this.state.events, null, 2)}</Text>
-            </ScrollView>
-          </View>
+          <CalendarState.Provider value={this.state}>
+            <Stack.Navigator screenOptions={ headerOptions }>
+              <Stack.Screen name='Calendar'
+                component={ CalendarComponent }
+                options={{
+                  title: 'Calendar',
+                  headerLeft: () => <DrawerToggle/>
+                }} />
+            </Stack.Navigator>
+          </CalendarState.Provider>
         );
       }
     }
@@ -119,25 +139,20 @@
 
 Теперь вы можете заменить дамп JSON на какой-то способ отобразить результаты в удобном для пользователя виде. В этом разделе мы покажем, как `FlatList` добавить элемент в экран календаря для отображения событий.
 
-1. Откройте файл **графтуториал/Graph/графманажер. js** и добавьте приведенный ниже `import` оператор в начало файла.
+1. Откройте файл **графтуториал/Graph/screens/календарскрин. Целевой** файл и добавьте приведенный ниже `import` оператор в начало файла.
 
-    ```js
+    ```typescript
     import moment from 'moment';
     ```
 
-1. Добавьте приведенный ниже **** метод над `CalendarScreen` объявлением класса.
+1. Добавьте приведенный ниже **above** метод над `CalendarScreen` объявлением класса.
 
-    ```js
-    convertDateTime = (dateTime) => {
-      const utcTime = moment.utc(dateTime);
-      return utcTime.local().format('MMM Do H:mm a');
-    };
-    ```
+    :::code language="typescript" source="../demo/GraphTutorial/screens/CalendarScreen.tsx" id="ConvertDateSnippet":::
 
-1. Замените `ScrollView` в `render` методе приведенный ниже метод.
+1. Замените `ScrollView` в `CalendarComponent` методе приведенный ниже метод.
 
-    ```JSX
-    <FlatList data={this.state.events}
+    ```typescript
+    <FlatList data={calendarState.events}
       renderItem={({item}) =>
         <View style={styles.eventItem}>
           <Text style={styles.eventSubject}>{item.subject}</Text>
