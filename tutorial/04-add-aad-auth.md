@@ -5,7 +5,7 @@
 1. Создайте новый каталог в каталоге **графтуториал** с именем **AUTH**.
 1. Создайте новый файл в каталоге **графтуториал/auth** с именем **AuthConfig. TS**. Добавьте указанный ниже код в файл.
 
-    :::code language="typescript" source="../demo/GraphTutorial/auth/AuthConfig.ts.example":::
+    :::code language="typescript" source="../demo/GraphTutorial/auth/AuthConfig.example.ts":::
 
     Замените `YOUR_APP_ID_HERE` идентификатором приложения, указанным в регистрации приложения.
 
@@ -20,36 +20,15 @@
 
     :::code language="typescript" source="../demo/GraphTutorial/auth/AuthManager.ts" id="AuthManagerSnippet":::
 
-1. Откройте файл **графтуториал/views/сигнинскрин. Целевой** файл и добавьте приведенный ниже `import` оператор в начало файла.
+1. Откройте **графтуториал/App. Целевой** файл и добавьте приведенный ниже `import` оператор в начало файла.
 
     ```typescript
-    import { AuthManager } from '../auth/AuthManager';
+    import { AuthManager } from './auth/AuthManager';
     ```
 
-1. Замените существующий `_signInAsync` метод на приведенный ниже.
+1. Замените существующее `authContext` объявление следующим.
 
-    :::code language="typescript" source="../demo/GraphTutorial/screens/SignInScreen.tsx" id="SignInAsyncSnippet":::
-
-1. Откройте файл **графтуториал/views/хомескрин. Целевой** файл и добавьте приведенный ниже `import` оператор в начало файла.
-
-    ```typescript
-    import { AuthManager } from '../auth/AuthManager';
-    ```
-
-1. Добавьте приведенный ниже метод в класс `HomeScreen`.
-
-    ```typescript
-    async componentDidMount() {
-      try {
-        const accessToken = await AuthManager.getAccessTokenAsync();
-
-        // TEMPORARY
-        this.setState({userName: accessToken, userLoading: false});
-      } catch (error) {
-        alert(error);
-      }
-    }
-    ```
+    :::code language="typescript" source="../demo/GraphTutorial/App.tsx" id="AuthContextSnippet" highlight="4-6,9":::
 
 1. Откройте файл **графтуториал/Menus/дравермену. Целевой** файл и добавьте приведенный ниже `import` оператор в начало файла.
 
@@ -57,9 +36,27 @@
     import { AuthManager } from '../auth/AuthManager';
     ```
 
-1. Замените существующий `_signOut` метод на приведенный ниже.
+1. Добавьте следующий код в `componentDidMount` функцию.
 
-    :::code language="typescript" source="../demo/GraphTutorial/menus/DrawerMenu.tsx" id="SignOutSnippet" highlight="5":::
+    ```typescript
+    try {
+      const accessToken = await AuthManager.getAccessTokenAsync();
+
+      // TEMPORARY
+      this.setState({userFirstName: accessToken, userLoading: false});
+    } catch (error) {
+      Alert.alert(
+        'Error getting token',
+        JSON.stringify(error),
+        [
+          {
+            text: 'OK'
+          }
+        ],
+        { cancelable: false }
+      );
+    }
+    ```
 
 1. Сохраните изменения и перезагрузите приложение в симуляторе.
 
@@ -67,7 +64,7 @@
 
 ## <a name="get-user-details"></a>Получение сведений о пользователе
 
-В этом разделе описывается создание настраиваемого поставщика проверки подлинности для клиентской библиотеки Graph, создание вспомогательного класса для хранения всех вызовов Microsoft Graph и обновление классов `HomeScreen` и `DrawerMenuContent` использование этого нового класса для получения пользователя, вошедшего в систему.
+В этом разделе описывается создание настраиваемого поставщика проверки подлинности для клиентской библиотеки Graph, создание вспомогательного класса для хранения всех вызовов Microsoft Graph и обновление `DrawerMenuContent` класса для использования этого нового класса для получения пользователя, вошедшего в систему.
 
 1. Создайте новый каталог в каталоге **графтуториал** с именем **Graph**.
 1. Создайте новый файл в каталоге **графтуториал/Graph** с именем **графауспровидер. TS**. Добавьте указанный ниже код в файл.
@@ -92,20 +89,13 @@
     export class GraphManager {
       static getUserAsync = async() => {
         // GET /me
-        return graphClient.api('/me').get();
+        return await graphClient
+          .api('/me')
+          .select('displayName,givenName,mail,mailboxSettings,userPrincipalName')
+          .get();
       }
     }
     ```
-
-1. Откройте файл **графтуториал/views/хомескрин. Целевой** файл и добавьте приведенный ниже `import` оператор в начало файла.
-
-    ```typescript
-    import { GraphManager } from '../graph/GraphManager';
-    ```
-
-1. Замените `componentDidMount` метод на приведенный ниже.
-
-    :::code language="typescript" source="../demo/GraphTutorial/screens/HomeScreen.tsx" id="ComponentDidMountSnippet" highlight="3-6,9":::
 
 1. Откройте файл **графтуториал/views/дравермену. Целевой** файл и добавьте приведенный ниже `import` оператор в начало файла.
 
@@ -113,7 +103,7 @@
     import { GraphManager } from '../graph/GraphManager';
     ```
 
-1. Добавьте указанный `DrawerMenuContent` ниже `componentDidMount` метод в класс.
+1. Замените `componentDidMount` метод на приведенный ниже.
 
     :::code language="typescript" source="../demo/GraphTutorial/menus/DrawerMenu.tsx" id="ComponentDidMountSnippet":::
 
